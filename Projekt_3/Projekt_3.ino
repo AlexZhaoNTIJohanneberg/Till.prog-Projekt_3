@@ -40,7 +40,7 @@ void setup() {
   Serial.begin(9600);
   LedSign::Init(GRAYSCALE);      // startar shield-LOL(LED skärmen)
 
-  for (int i = 0; ; i++) {
+  for (int i = 0; ; i++) {       // Läser av texten(char text[])
     if (text[i] == 0) {
       leng = i;
       break;
@@ -53,7 +53,7 @@ void setupgame() {   //Uppstartning för spelet(genererar values)
 
   gamespeed = 100;  //Hur snabbt spelet går(bl.a ormens hastighet)
 
-  alive = true;
+  alive = true;                    //Säger att ormen lever(spelet kan starta)
   snakeLength = 4;                 //Längden på ormen vid start
   snakeX[0] = 0;                   //Startpunkten för ormen hos x-axeln
   snakeY[0] = random(0, 9);        //Startpunkten för ormen hos y-axeln
@@ -148,36 +148,29 @@ void drawsnake() {     //Funktion som lyser upp ormen.
 
 void movesnake() {     //Funktionen gör så att ormen rör på sig
 
-  for (int i = snakeLength - 1; i > 0; i--) {
-    Serial.print("X before: ");
-    Serial.print(snakeX[i]);
-    Serial.print("\t");
+  for (int i = snakeLength - 1; i > 0; i--) {  //Uppdaterar ormens kropp
     snakeX[i] = snakeX[i - 1];
-    //snakeY[i] = snakeY[i - 1];
-    Serial.print("X after: ");
-    Serial.println(snakeX[i]);
-
-    
+    snakeY[i] = snakeY[i - 1];
   }
-
-  snakeX[0] += dirX;
+  //Uppdaterar ormens huvud
+  snakeX[0] += dirX;    
   snakeY[0] += dirY;
 
 }
 
 
-void snakegame() {
+void snakegame() {    //Funktionen som kör spelet med hjälp av de andra funnktionerna
   joystickinput();
-  LedSign::Clear();
+  LedSign::Clear();   //Clear:ar shield-lol från upplysta LED-lampor i tidigare 'frames'
   movesnake();
 
   checkcollisionsnake();
-  if (checkcollisionsnake()) {
-    alive = false;
+  if (checkcollisionsnake()) {   //Ormen 'dör' och spelet avslutas
+    alive = false;    
     delay(2000);
   }
-  if (checkcollisionfood()) {
-    snakeLength++;
+  if (checkcollisionfood()) {    //Ormen blir längre och det genereras ny mat(1)
+    snakeLength++;           
     foodX = random(0, 14);
     foodY = random(0, 9);
   }
@@ -193,21 +186,21 @@ void snakegame() {
 void loop() {
   setupgame();
 
-  //Myfont::Banner(leng, text);
+  Myfont::Banner(leng, text);
 
-  if (analogRead(VRb) == 0) {
+  if (analogRead(VRb) == 0) {     //Läser av Joystickens SW-pin som är när man trycket på joysticken.
     start = true;
   }
   else {
     start = false;
   }
 
-  while (alive == true && start == true) {
+  while (alive == true && start == true) { //Runnar spelet endast om man trycker in knappen och ormen är levande
     snakegame();
   }
   LedSign::Clear();
   
-  for (int i = 0; i < snakeLength; i++) {
+  for (int i = 0; i < snakeLength; i++) {  //clearar alla LED-dioder från ormen
     snakeX[i] = -1;
     snakeY[i] = -1;
   }
